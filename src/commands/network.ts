@@ -5,6 +5,14 @@ import { TelegrafContext } from 'telegraf/typings/context'
 export async function handleNetwork(ctx: TelegrafContext & UserProp) {
   const password = ctx.message.text.substr('/network '.length)
   if (!password) {
+    if (ctx.dbuser.password) {
+      const number = await UserModel.countDocuments({
+        password: ctx.dbuser.password,
+      })
+      return ctx.replyWithHTML(
+        `Вы подписаны на сообщество с паролем <code>${ctx.dbuser.password}</code>. На данный момент, количество людей в сообществе: ${number}. Каждые 2 дня бот будет присылать вам новый контакт. Спасибо!`
+      )
+    }
     return ctx.replyWithHTML(
       'Пожалуйста, пришлите сообщение в формате <code>/network пароль_коммьюнити</code>.'
     )
