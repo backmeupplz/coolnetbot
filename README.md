@@ -1,10 +1,8 @@
-# Telegram bot template based on telegraf.js.org
-
-Please, enjoy this starter template for Telegram bots based on telegraf.js.org. It includes most common middlewares used by me, MongoDB integration, language picker and internationalization and shows basic encapsulation techniques used by me.
+# Telegram community network bot that enables users to drink coffee/tea/water with random community members
 
 # Installation and local launch
 
-1. Clone this repo: `git clone https://github.com/backmeupplz/telegraf-template`
+1. Clone this repo: `git clone https://github.com/backmeupplz/coolnetbot`
 2. Launch the [mongo database](https://www.mongodb.com/) locally
 3. Create `.env` with the environment variables listed below
 4. Run `yarn install` in the root folder
@@ -18,6 +16,10 @@ And you should be good to go! Feel free to fork and submit pull requests. Thanks
 - `MONGO`— URL of the mongo database
 
 Also, please, consider looking at `.env.sample`.
+
+# Continuous integration
+
+Any commit pushed to master gets deployed to [@coolnetbot](https://t.me/coolnetbot) via [CI Ninja](https://github.com/backmeupplz/ci-ninja).
 
 # License
 
