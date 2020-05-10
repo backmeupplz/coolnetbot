@@ -12,9 +12,9 @@ bot.use(checkTime)
 // Attach user
 bot.use(attachUser)
 // Setup commands
-bot.command(['start', 'help'], sendHelp)
 bot.command('network', handleNetwork)
 bot.command('nonetwork', handleNonetwork)
+bot.use(sendHelp)
 // Catch error
 bot.catch(console.error)
 
