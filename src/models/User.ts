@@ -1,20 +1,17 @@
 // Dependencies
-import { prop, Typegoose } from 'typegoose'
+import { prop, getModelForClass } from '@typegoose/typegoose'
 
-export class User extends Typegoose {
+export class User {
   @prop({ required: true, index: true, unique: true })
   id: number
-
-  @prop({ required: true, default: 'en' })
-  language: string
+  @prop({ index: true })
+  password?: string
 }
 
-// Get User model
-const UserModel = new User().getModelForClass(User, {
+export const UserModel = getModelForClass(User, {
   schemaOptions: { timestamps: true },
 })
 
-// Get or create user
 export async function findUser(id: number) {
   let user = await UserModel.findOne({ id })
   if (!user) {

@@ -1,26 +1,25 @@
-// Config dotenv
 import * as dotenv from 'dotenv'
 dotenv.config({ path: `${__dirname}/../.env` })
-// Dependencies
 import { bot } from './helpers/bot'
 import { checkTime } from './middlewares/checkTime'
-import { setupHelp } from './commands/help'
-import { setupI18N } from './helpers/i18n'
-import { setupLanguage } from './commands/language'
+import { sendHelp } from './commands/help'
 import { attachUser } from './middlewares/attachUser'
+import { handleNetwork } from './commands/network'
+import { handleNonetwork } from './commands/nonetwork'
 
 // Check time
 bot.use(checkTime)
 // Attach user
 bot.use(attachUser)
-// Setup localization
-setupI18N(bot)
 // Setup commands
-setupHelp(bot)
-setupLanguage(bot)
+bot.command(['start', 'help'], sendHelp)
+bot.command('network', handleNetwork)
+bot.command('nonetwork', handleNonetwork)
+// Catch error
+bot.catch(console.error)
 
 // Start bot
-bot.startPolling()
+bot.launch()
 
 // Log
 console.info('Bot is up and running')

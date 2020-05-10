@@ -1,12 +1,3 @@
-// Dependencies
-import { ContextMessageUpdate, Telegraf } from 'telegraf'
-const TelegrafBot = require('telegraf')
+import { Telegraf } from 'telegraf'
 
-export const bot = new TelegrafBot(process.env.TOKEN) as Telegraf<
-  ContextMessageUpdate
->
-
-bot.telegram.getMe().then(botInfo => {
-  const anybot = bot as any
-  anybot.options.username = botInfo.username
-})
+export const bot = new Telegraf(process.env.TOKEN)
