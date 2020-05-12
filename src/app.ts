@@ -14,6 +14,7 @@ bot.use(checkTime)
 // Attach user
 bot.use(attachUser)
 // Setup commands
+bot.command('start', handleNetwork)
 bot.command('network', handleNetwork)
 bot.command('nonetwork', handleNonetwork)
 bot.command('matchmake', checkSuperAdmin, matchmake)
