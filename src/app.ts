@@ -6,6 +6,8 @@ import { sendHelp } from './commands/help'
 import { attachUser } from './middlewares/attachUser'
 import { handleNetwork } from './commands/network'
 import { handleNonetwork } from './commands/nonetwork'
+import { matchmake } from './helpers/matchmaking'
+import { checkSuperAdmin } from './middlewares/checkSuperAdmin'
 
 // Check time
 bot.use(checkTime)
@@ -14,6 +16,7 @@ bot.use(attachUser)
 // Setup commands
 bot.command('network', handleNetwork)
 bot.command('nonetwork', handleNonetwork)
+bot.command('matchmake', checkSuperAdmin, matchmake)
 bot.use(sendHelp)
 // Catch error
 bot.catch(console.error)
