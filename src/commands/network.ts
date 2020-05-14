@@ -1,15 +1,13 @@
 import { UserModel } from './../models/User'
 import { UserProp } from './../helpers/UserProp'
 import { TelegrafContext } from 'telegraf/typings/context'
-import { Markup } from 'telegraf'
 
 export async function handleNetwork(ctx: TelegrafContext & UserProp) {
-  const [, password] = ctx.message.text.split(' ')
-
-  const networkUrl = `t.me/${ctx.botInfo.username}?start=${password}`
+  let [, password] = ctx.message.text.split(' ')
 
   if (!password) {
     if (ctx.dbuser.password) {
+      const networkUrl = `t.me/${ctx.dbuser.password}?start=${password}`
       const number = await UserModel.countDocuments({
         password: ctx.dbuser.password,
       })
@@ -21,6 +19,7 @@ export async function handleNetwork(ctx: TelegrafContext & UserProp) {
       'Пожалуйста, пришлите сообщение в формате <code>/network пароль_коммьюнити</code>.'
     )
   }
+  const networkUrl = `t.me/${ctx.botInfo.username}?start=${password}`
   const number = await UserModel.countDocuments({ password })
   if (ctx.dbuser.password === password) {
     return ctx.replyWithHTML(
@@ -33,7 +32,7 @@ export async function handleNetwork(ctx: TelegrafContext & UserProp) {
 
   return ctx.replyWithHTML(
     `Успех! Вы успешно подписались на сообщество с паролем <code>${password}</code>. На данный момент, количество людей в сообществе: ${
-    number + 1
-    }. Ссылка для приглашения: ${networkUrl}. Каждые 2 дня бот будет присылать вам новый контакт. Спасибо!`,
+      number + 1
+    }. Ссылка для приглашения: ${networkUrl}. Каждые 2 дня бот будет присылать вам новый контакт. Спасибо!`
   )
 }
