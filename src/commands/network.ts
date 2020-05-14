@@ -7,7 +7,7 @@ export async function handleNetwork(ctx: TelegrafContext & UserProp) {
 
   if (!password) {
     if (ctx.dbuser.password) {
-      const networkUrl = `t.me/${ctx.dbuser.password}?start=${password}`
+      const networkUrl = `t.me/${ctx.botInfo.username}?start=${ctx.dbuser.password}`
       const number = await UserModel.countDocuments({
         password: ctx.dbuser.password,
       })
