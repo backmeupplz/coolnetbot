@@ -16,7 +16,7 @@ bot.use(attachUser)
 // Setup commands
 bot.command('start', handleNetwork)
 bot.command('network', handleNetwork)
-bot.command('nonetwork', handleNonetwork)
+bot.command(['nonetwork', 'stop'], handleNonetwork)
 bot.command('matchmake', checkSuperAdmin, matchmake)
 bot.use(sendHelp)
 // Catch error

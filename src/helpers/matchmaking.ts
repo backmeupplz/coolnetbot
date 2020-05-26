@@ -1,3 +1,4 @@
+import { frequency } from './frequency'
 import { UserModel, User } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import { bot } from './bot'
@@ -63,7 +64,7 @@ export async function matchmake() {
         firstUser.id,
         `Откройте профиль вашего собеседника, <a href="tg://user?id=${secondUser.id}">нажав вот здесь</a>. Спишитесь с этим собеседником, договоритесь о времени, когда будет удобно созвониться — и созвонитесь с ним или ней!
         
-Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через 2 дня. Спасибо за участие в сообществе с паролем ${firstUser.password}!`,
+Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${firstUser.password}!`,
         {
           parse_mode: 'HTML',
         }
@@ -72,7 +73,7 @@ export async function matchmake() {
         secondUser.id,
         `Откройте профиль вашего собеседника, <a href="tg://user?id=${firstUser.id}">нажав вот здесь</a>. Спишитесь с этим собеседником, договоритесь о времени, когда будет удобно созвониться — и созвонитесь с ним или ней!
 
-Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через 2 дня. Спасибо за участие в сообществе с паролем ${secondUser.password}`,
+Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${secondUser.password}`,
         {
           parse_mode: 'HTML',
         }
@@ -81,7 +82,7 @@ export async function matchmake() {
   }
 }
 
-const job = new CronJob('0 0 */2 * *', () => {
+const job = new CronJob(`0 0 */${frequency} * *`, () => {
   matchmake()
 })
 job.start()
