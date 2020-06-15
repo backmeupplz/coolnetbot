@@ -2,6 +2,8 @@ import { frequency } from './frequency'
 import { UserModel, User } from '../models/User'
 import { DocumentType } from '@typegoose/typegoose'
 import { bot } from './bot'
+import { Context, Markup, Extra } from 'telegraf'
+
 const CronJob = require('cron').CronJob
 
 export async function matchmake() {
@@ -60,7 +62,7 @@ export async function matchmake() {
     } else {
       const firstUser = pair[0]
       const secondUser = pair[1]
-      bot.telegram.sendMessage(
+      await bot.telegram.sendMessage(
         firstUser.id,
         `Откройте профиль вашего собеседника, <a href="tg://user?id=${secondUser.id}">нажав вот здесь</a>. Спишитесь с этим собеседником, договоритесь о времени, когда будет удобно созвониться — и созвонитесь с ним или ней!
         
@@ -68,6 +70,18 @@ export async function matchmake() {
         {
           parse_mode: 'HTML',
         }
+      )
+      await bot.telegram.sendMessage(
+        firstUser.id,
+        `<a href="tg://user?id=${secondUser.id}">Собеседник</a> вам ответил?`,
+        Extra.markdown()
+          .HTML(true)
+          .markup(
+            Markup.inlineKeyboard([
+              Markup.callbackButton('Ответил 👍', `y~${secondUser.id}`),
+              Markup.callbackButton('Не ответил 👎', `n~${secondUser.id}`),
+            ])
+          )
       )
       bot.telegram.sendMessage(
         secondUser.id,
@@ -78,6 +92,18 @@ export async function matchmake() {
           parse_mode: 'HTML',
         }
       )
+      await bot.telegram.sendMessage(
+        secondUser.id,
+        `<a href="tg://user?id=${firstUser.id}">Собеседник</a> вам ответил?`,
+        Extra.markdown()
+          .HTML(true)
+          .markup(
+            Markup.inlineKeyboard([
+              Markup.callbackButton('Ответил 👍', `y~${firstUser.id}`),
+              Markup.callbackButton('Не ответил 👎', `n~${firstUser.id}`),
+            ])
+          )
+      )
     }
   }
 }
@@ -86,3 +112,27 @@ const job = new CronJob(`0 0 */${frequency} * *`, () => {
   matchmake()
 })
 job.start()
+
+export async function actionCallback(ctx: Context) {
+  await ctx.deleteMessage()
+  await ctx.answerCbQuery()
+  const components = ctx.callbackQuery.data.split('~')
+  const responded = components[0] === 'y'
+  if (responded) {
+    return
+  }
+  const user = await UserModel.findOne({ id: +components[1] })
+  if (!user) {
+    return
+  }
+  user.notRespondedTimes++
+  await user.save()
+  if (user.notRespondedTimes > 2) {
+    user.password = undefined
+    await user.save()
+    await bot.telegram.sendMessage(
+      user.id,
+      'Похоже, вы уже в третий раз не отвечаете собеседнику. Поэтому мы выключили вам нетворкинг. Если захотите — включите снова. Удачи!'
+    )
+  }
+}

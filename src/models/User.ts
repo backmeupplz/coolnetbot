@@ -6,6 +6,8 @@ export class User {
   id: number
   @prop({ index: true })
   password?: string
+  @prop({ required: true, default: 0 })
+  notRespondedTimes: number
 }
 
 export const UserModel = getModelForClass(User, {

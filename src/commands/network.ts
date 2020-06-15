@@ -37,6 +37,7 @@ export async function handleNetwork(ctx: TelegrafContext & UserProp) {
     )
   }
   ctx.dbuser.password = password
+  ctx.dbuser.notRespondedTimes = 0
 
   await ctx.dbuser.save()
 
