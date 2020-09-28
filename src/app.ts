@@ -8,6 +8,7 @@ import { handleNetwork } from './commands/network'
 import { handleNonetwork } from './commands/nonetwork'
 import { matchmake, actionCallback } from './helpers/matchmaking'
 import { checkSuperAdmin } from './middlewares/checkSuperAdmin'
+import { handleNetworks } from './commands/networks'
 
 // Check time
 bot.use(checkTime)
@@ -17,6 +18,7 @@ bot.use(attachUser)
 bot.command('start', handleNetwork)
 bot.command('network', handleNetwork)
 bot.command(['nonetwork', 'stop'], handleNonetwork)
+bot.command('networks', handleNetworks)
 bot.command('matchmake', checkSuperAdmin, matchmake)
 // Setup callback
 bot.action(/.+/, actionCallback)

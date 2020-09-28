@@ -1,11 +1,10 @@
-// Dependencies
 import { prop, getModelForClass } from '@typegoose/typegoose'
 
 export class User {
   @prop({ required: true, index: true, unique: true })
   id: number
-  @prop({ index: true })
-  password?: string
+  @prop({ type: String, index: true, required: true, default: [] })
+  passwords: string[]
   @prop({ required: true, default: 0 })
   notRespondedTimes: number
 }

@@ -15,17 +15,17 @@
     "watch-js": "nodemon dist/app.js"
   },
   "devDependencies": {
-    "concurrently": "^5.2.0",
-    "nodemon": "^2.0.3"
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.4"
   },
   "dependencies": {
-    "@typegoose/typegoose": "^7.0.0",
-    "@types/mongoose": "^5.7.16",
-    "@types/node": "^13.13.5",
+    "@typegoose/typegoose": "^7.4.1",
+    "@types/mongoose": "^5.7.36",
+    "@types/node": "^14.11.2",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.9.13",
+    "mongoose": "^5.10.7",
     "telegraf": "^3.38.0",
-    "typescript": "^3.8.3"
+    "typescript": "^4.0.3"
   }
 }

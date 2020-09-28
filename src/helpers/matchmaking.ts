@@ -9,19 +9,23 @@ const CronJob = require('cron').CronJob
 export async function matchmake() {
   // Get and filter users
   const users = (await UserModel.find({ password: { $exists: true } })).filter(
-    (u) => !!u.password
+    (u) => !!u.passwords.length
   )
   // Get passwords to list of users
   const passwordsToUsers = {} as { [index: string]: DocumentType<User>[] }
   users.forEach((u) => {
-    if (passwordsToUsers[u.password]) {
-      passwordsToUsers[u.password].push(u)
-    } else {
-      passwordsToUsers[u.password] = [u]
+    for (const password of u.passwords) {
+      if (passwordsToUsers[password]) {
+        if (!passwordsToUsers[password].includes(u)) {
+          passwordsToUsers[password].push(u)
+        }
+      } else {
+        passwordsToUsers[password] = [u]
+      }
     }
   })
   // Do the matchmaking
-  const pairs = [] as Array<Array<DocumentType<User>>>
+  const pairs = [] as Array<{ first: User; second?: User; password: string }>
   for (const password in passwordsToUsers) {
     // Get users
     const users = passwordsToUsers[password]
@@ -29,7 +33,7 @@ export async function matchmake() {
     while (users.length > 0) {
       // Just one user
       if (users.length < 2) {
-        pairs.push([users[0]])
+        pairs.push({ first: users[0], password })
         users.splice(0, 1)
         continue
       }
@@ -41,44 +45,51 @@ export async function matchmake() {
         1
       )[0]
       // Add pair
-      pairs.push([firstUser, secondUser])
+      pairs.push({ first: firstUser, second: secondUser, password })
     }
   }
-  console.log(pairs.map((p) => p.map((u) => `${u.id} ${u.password}`)))
   // Send messages
   for (const pair of pairs) {
     // Just one user
-    if (pair.length < 2) {
-      const user = pair[0]
-      bot.telegram.sendMessage(
-        user.id,
-        `Похоже, в этот раз вы остались без пары! Ничего страшного, в следующий раз вам, скорее всего, повезет больше, если в сообществе с паролем ${user.password} больше 1 участника. Либо их меньше 1, либо количество участников нечетное.
-
-В любом случае, зовите больше людей подключаться командой /network ${user.password}, чтобы такого больше не было! Вместе веселее!`,
-        {
-          parse_mode: 'HTML',
-        }
-      )
-    } else {
-      const firstUser = pair[0]
-      const secondUser = pair[1]
+    if (!pair.second) {
+      const user = pair.first
       try {
         await bot.telegram.sendMessage(
+          user.id,
+          `Похоже, в этот раз вы остались без пары в сообществе ${
+            pair.password
+          }! Ничего страшного, в следующий раз вам, скорее всего, повезет больше, если в сообществе с паролем ${
+            pair.password
+          } больше 1 участника. Сейчас либо их меньше 1, либо количество участников нечетное.
+  
+  В любом случае, зовите больше людей подключаться по ссылке t.me/${
+    (await bot.telegram.getMe()).username
+  }?start=${pair.password}, чтобы такого больше не было! Вместе веселее!`,
+          {
+            parse_mode: 'HTML',
+            disable_web_page_preview: true,
+          }
+        )
+      } catch (err) {
+        // Do nothing
+      }
+    } else {
+      const firstUser = pair.first
+      const secondUser = pair.second
+      try {
+        const sent = await bot.telegram.sendMessage(
           firstUser.id,
           `Откройте профиль вашего собеседника, <a href="tg://user?id=${secondUser.id}">нажав вот здесь</a>. Спишитесь с этим собеседником, договоритесь о времени, когда будет удобно созвониться — и созвонитесь с ним или ней!
           
-Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${firstUser.password}!`,
+Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${pair.password}!`,
           {
             parse_mode: 'HTML',
+            disable_web_page_preview: true,
           }
         )
-      } catch {
-        // do nothing
-      }
-      try {
         await bot.telegram.sendMessage(
           firstUser.id,
-          `<a href="tg://user?id=${secondUser.id}">Собеседник</a> вам ответил?`,
+          `<a href="tg://user?id=${secondUser.id}">Собеседник</a> из ${pair.password} вам ответил?`,
           Extra.markdown()
             .HTML(true)
             .markup(
@@ -87,27 +98,24 @@ export async function matchmake() {
                 Markup.callbackButton('Не ответил 👎', `n~${secondUser.id}`),
               ])
             )
+            .inReplyTo(sent.message_id)
         )
       } catch {
         // do nothing
       }
       try {
-        await bot.telegram.sendMessage(
+        const sent = await bot.telegram.sendMessage(
           secondUser.id,
           `Откройте профиль вашего собеседника, <a href="tg://user?id=${firstUser.id}">нажав вот здесь</a>. Спишитесь с этим собеседником, договоритесь о времени, когда будет удобно созвониться — и созвонитесь с ним или ней!
   
-Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${secondUser.password}`,
+Я отправил вашему собеседнику и ваш контакт. Следующий собеседник появится через ${frequency} дня. Спасибо за участие в сообществе с паролем ${pair.password}`,
           {
             parse_mode: 'HTML',
           }
         )
-      } catch {
-        // do nothing
-      }
-      try {
         await bot.telegram.sendMessage(
           secondUser.id,
-          `<a href="tg://user?id=${firstUser.id}">Собеседник</a> вам ответил?`,
+          `<a href="tg://user?id=${firstUser.id}">Собеседник</a> из ${pair.password} вам ответил?`,
           Extra.markdown()
             .HTML(true)
             .markup(
@@ -116,6 +124,7 @@ export async function matchmake() {
                 Markup.callbackButton('Не ответил 👎', `n~${firstUser.id}`),
               ])
             )
+            .inReplyTo(sent.message_id)
         )
       } catch {
         // do nothing
@@ -144,7 +153,7 @@ export async function actionCallback(ctx: Context) {
   user.notRespondedTimes++
   await user.save()
   if (user.notRespondedTimes > 2) {
-    user.password = undefined
+    user.passwords = []
     await user.save()
     await bot.telegram.sendMessage(
       user.id,
