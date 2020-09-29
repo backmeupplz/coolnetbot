@@ -9,6 +9,9 @@ export async function handleNetworks(ctx: TelegrafContext & UserProp) {
             (p) => `<a href="t.me/${ctx.botInfo.username}?start=${p}">${p}</a>`
           )
           .join(', ')}`
-      : 'Вы еще не подписаны на сообщества'
+      : 'Вы еще не подписаны на сообщества',
+    {
+      disable_web_page_preview: true,
+    }
   )
 }
