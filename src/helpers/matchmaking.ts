@@ -41,7 +41,7 @@ export async function matchmake() {
       const firstUser = users.splice(0, 1)[0]
       // Random second user
       const secondUser = users.splice(
-        Math.floor(Math.random() * (users.length - 1)),
+        Math.floor(Math.random() * users.length),
         1
       )[0]
       // Add pair
