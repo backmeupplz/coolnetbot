@@ -91,7 +91,7 @@ export async function matchmake() {
         )
         await bot.telegram.sendMessage(
           firstUser.id,
-          `<a href="tg://user?id=${secondUser.id}">Собеседник</a> из ${pair.password} вам ответил?`,
+          `<a href="tg://user?id=${secondUser.id}">Собеседник</a> из ${pair.password} вам ответил? Если у вас нет ссылки на собеседника, смело ставьте палец вниз. Человек отключил бота, но не вышел из пула нетворкинга 😂`,
           Extra.markdown()
             .HTML(true)
             .markup(
@@ -117,7 +117,7 @@ export async function matchmake() {
         )
         await bot.telegram.sendMessage(
           secondUser.id,
-          `<a href="tg://user?id=${firstUser.id}">Собеседник</a> из ${pair.password} вам ответил?`,
+          `<a href="tg://user?id=${firstUser.id}">Собеседник</a> из ${pair.password} вам ответил? Если у вас нет ссылки на собеседника, смело ставьте палец вниз. Человек отключил бота, но не вышел из пула нетворкинга 😂`,
           Extra.markdown()
             .HTML(true)
             .markup(
