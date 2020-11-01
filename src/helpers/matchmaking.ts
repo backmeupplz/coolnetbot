@@ -8,7 +8,7 @@ const CronJob = require('cron').CronJob
 
 export async function matchmake() {
   // Get and filter users
-  const users = (await UserModel.find({ password: { $exists: true } })).filter(
+  const users = (await UserModel.find({ passwords: { $exists: true } })).filter(
     (u) => !!u.passwords.length
   )
   // Get passwords to list of users
@@ -61,10 +61,12 @@ export async function matchmake() {
           }! Ничего страшного, в следующий раз вам, скорее всего, повезет больше, если в сообществе с паролем ${
             pair.password
           } больше 1 участника. Сейчас либо их меньше 1, либо количество участников нечетное.
-  
-  В любом случае, зовите больше людей подключаться по ссылке t.me/${
-    (await bot.telegram.getMe()).username
-  }?start=${pair.password}, чтобы такого больше не было! Вместе веселее!`,
+
+В любом случае, зовите больше людей подключаться по ссылке t.me/${
+            (await bot.telegram.getMe()).username
+          }?start=${
+            pair.password
+          }, чтобы такого больше не было! Вместе веселее!`,
           {
             parse_mode: 'HTML',
             disable_web_page_preview: true,
