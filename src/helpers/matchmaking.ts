@@ -141,13 +141,18 @@ const job = new CronJob(`0 0 */${frequency} * *`, () => {
 job.start()
 
 export async function actionCallback(ctx: Context) {
-  console.log(ctx.callbackQuery)
   try {
     await ctx.deleteMessage()
     await ctx.answerCbQuery()
-  } catch (err) {
-    console.log(err)
-    // Do nothing
+  } catch {
+    try {
+      await ctx.editMessageText(
+        'Найс! Спасибо за репорт об активности этого собеседника!'
+      )
+      await ctx.editMessageReplyMarkup()
+    } catch {
+      // Do nothing
+    }
   }
   const components = ctx.callbackQuery.data.split('~')
   const responded = components[0] === 'y'
