@@ -145,7 +145,8 @@ export async function actionCallback(ctx: Context) {
   try {
     await ctx.deleteMessage()
     await ctx.answerCbQuery()
-  } catch {
+  } catch (err) {
+    console.log(err)
     // Do nothing
   }
   const components = ctx.callbackQuery.data.split('~')
