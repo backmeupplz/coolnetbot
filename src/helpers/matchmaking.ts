@@ -141,6 +141,7 @@ const job = new CronJob(`0 0 */${frequency} * *`, () => {
 job.start()
 
 export async function actionCallback(ctx: Context) {
+  console.log(ctx.callbackQuery)
   try {
     await ctx.deleteMessage()
     await ctx.answerCbQuery()
